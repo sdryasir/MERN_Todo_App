@@ -58,4 +58,32 @@ Before running the application, make sure you have the following software instal
 
 Contributions are welcome! If you find any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
 
+
+## SRE Setup
+
+Phase 0  → Architecture Design & Repository Preparation
+Phase 1  → Understand and Refactor Application for Production
+Phase 2  → Containerization (Production Docker Images)
+Phase 3  → Local Kubernetes Platform (Multi-node KIND)
+Phase 4  → Kubernetes Application Deployment
+Phase 5  → Helm Packaging
+Phase 6  → GitLab Repository & Branch Strategy
+Phase 7  → Jenkins CI Pipeline
+Phase 8  → Jenkins CD Pipeline
+Phase 9  → Container Registry
+Phase 10 → Kubernetes Production Features
+Phase 11 → Monitoring (Prometheus Stack)
+Phase 12 → Grafana Dashboards
+Phase 13 → Logging (ELK + Filebeat)
+Phase 14 → Distributed Tracing
+Phase 15 → Alerting & PagerDuty
+Phase 16 → SRE Practices (SLI/SLO/Error Budget)
+Phase 17 → Security Hardening
+Phase 18 → Backup & Disaster Recovery
+Phase 19 → Performance Testing & Capacity Planning
+Phase 20 → Chaos Engineering
+Phase 21 → Production Readiness Review
+
+## PHASE 0 — Architecture Understanding
+
     
