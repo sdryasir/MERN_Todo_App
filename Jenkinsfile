@@ -1,59 +1,88 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'Node 25'
+    environment {
+        COMPOSE_PROJECT_NAME = 'todo-app'
     }
 
     stages {
-        stage('Verify Tools') {
+        stage('Checkout') {
             steps {
-                bat 'node --version'
-                bat 'npm --version'
-                bat 'git --version'
+                checkout scm
             }
         }
 
-        stage('Install Server Dependencies') {
+        stage('Validate Docker Compose') {
             steps {
-                dir('server') {
-                    bat 'npm ci'
-                }
+                sh '''
+                    docker compose config
+                '''
             }
         }
 
-        stage('Install Client Dependencies') {
+        stage('Stop Existing Containers') {
             steps {
-                dir('client') {
-                    bat 'npm ci'
-                }
+                sh '''
+                    docker compose down --remove-orphans || true
+                '''
             }
         }
 
-        stage('Server Tests') {
+        stage('Build Images') {
             steps {
-                dir('server') {
-                    bat 'npm test -- --runInBand'
-                }
+                sh '''
+                    docker compose build --no-cache
+                '''
             }
         }
 
-        stage('Build Client') {
+        stage('Start Application') {
             steps {
-                dir('client') {
-                    bat 'npm run build'
-                }
+                sh '''
+                    docker compose up -d
+                '''
+            }
+        }
+
+        stage('Verify Containers') {
+            steps {
+                sh '''
+                    docker compose ps
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                    echo "Waiting for services to start..."
+                    sleep 15
+
+                    curl --fail --silent http://localhost:5000/health \
+                        || curl --fail --silent http://localhost:5000 \
+                        || exit 1
+
+                    curl --fail --silent http://localhost:3000 \
+                        || exit 1
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'CI pipeline completed successfully.'
+            echo 'Todo application deployed successfully.'
+            echo 'Frontend: http://localhost:3000'
+            echo 'Backend: http://localhost:5000'
         }
 
         failure {
-            echo 'CI pipeline failed. Check the failed stage logs.'
+            echo 'Deployment failed. Showing container logs.'
+
+            sh '''
+                docker compose ps || true
+                docker compose logs --tail=200 || true
+            '''
         }
 
         always {
