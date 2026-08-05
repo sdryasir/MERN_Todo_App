@@ -14,7 +14,7 @@ pipeline {
 
         stage('Validate Docker Compose') {
             steps {
-                sh '''
+                bat '''
                     docker compose config
                 '''
             }
@@ -22,7 +22,7 @@ pipeline {
 
         stage('Stop Existing Containers') {
             steps {
-                sh '''
+                bat '''
                     docker compose down --remove-orphans || true
                 '''
             }
@@ -30,7 +30,7 @@ pipeline {
 
         stage('Build Images') {
             steps {
-                sh '''
+                bat '''
                     docker compose build --no-cache
                 '''
             }
@@ -38,7 +38,7 @@ pipeline {
 
         stage('Start Application') {
             steps {
-                sh '''
+                bat '''
                     docker compose up -d
                 '''
             }
@@ -46,7 +46,7 @@ pipeline {
 
         stage('Verify Containers') {
             steps {
-                sh '''
+                bat '''
                     docker compose ps
                 '''
             }
@@ -54,7 +54,7 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                sh '''
+                bat '''
                     echo "Waiting for services to start..."
                     sleep 15
 
@@ -79,7 +79,7 @@ pipeline {
         failure {
             echo 'Deployment failed. Showing container logs.'
 
-            sh '''
+            bat '''
                 docker compose ps || true
                 docker compose logs --tail=200 || true
             '''
