@@ -6,17 +6,58 @@ pipeline {
     }
 
     stages {
-        stage('Verify Node') {
+        stage('Verify Tools') {
             steps {
-                bat 'node -v'
-                bat 'npm -v'
+                bat 'node --version'
+                bat 'npm --version'
+                bat 'git --version'
             }
         }
 
-        stage('Hello') {
+        stage('Install Server Dependencies') {
             steps {
-                echo 'Jenkins is working!'
+                dir('server') {
+                    bat 'npm ci'
+                }
             }
+        }
+
+        stage('Install Client Dependencies') {
+            steps {
+                dir('client') {
+                    bat 'npm ci'
+                }
+            }
+        }
+
+        stage('Server Tests') {
+            steps {
+                dir('server') {
+                    bat 'npm test -- --runInBand'
+                }
+            }
+        }
+
+        stage('Build Client') {
+            steps {
+                dir('client') {
+                    bat 'npm run build'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'CI pipeline completed successfully.'
+        }
+
+        failure {
+            echo 'CI pipeline failed. Check the failed stage logs.'
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
