@@ -66,9 +66,9 @@ pipeline {
             steps {
                 bat '''
                     echo "Waiting for services to start..."
-                    sleep 15
+                    
 
-                    curl --fail --silent http://localhost:5000/health \
+                    curl --fail --silent http://localhost:5000/health/live \
                         || curl --fail --silent http://localhost:5000 \
                         || exit 1
 
