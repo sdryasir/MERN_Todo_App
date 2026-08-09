@@ -11,6 +11,15 @@ pipeline {
                 checkout scm
             }
         }
+        stages {
+        stage('Check Docker') {
+                steps {
+                    bat 'echo %PATH%'
+                    bat 'where docker'
+                    bat 'docker --version'
+                }
+            }
+        }
 
         stage('Validate Docker Compose') {
             steps {
