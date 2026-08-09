@@ -14,6 +14,7 @@ pipeline {
 
         stage('Validate Docker Compose') {
             steps {
+                echo "Validating Docker Compose"
                 bat '''
                     docker compose config
                 '''
@@ -22,6 +23,7 @@ pipeline {
 
         stage('Stop Existing Containers') {
             steps {
+                echo "Stoping Existing Containers"
                 bat '''
                     docker compose down --remove-orphans || true
                 '''
