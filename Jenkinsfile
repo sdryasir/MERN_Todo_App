@@ -11,9 +11,18 @@ pipeline {
                 checkout scm
             }
         }
+        
+        stage('Check Docker') {
+                steps {
+                    bat 'echo %PATH%'
+                    bat 'where docker'
+                    bat 'docker --version'
+                }
+            }
 
         stage('Validate Docker Compose') {
             steps {
+                echo "Validating Docker Compose"
                 bat '''
                     docker compose config
                 '''
@@ -22,6 +31,7 @@ pipeline {
 
         stage('Stop Existing Containers') {
             steps {
+                echo "Stoping Existing Containers"
                 bat '''
                     docker compose down --remove-orphans || true
                 '''
@@ -56,9 +66,9 @@ pipeline {
             steps {
                 bat '''
                     echo "Waiting for services to start..."
-                    sleep 15
+                    
 
-                    curl --fail --silent http://localhost:5000/health \
+                    curl --fail --silent http://localhost:5000/health/live \
                         || curl --fail --silent http://localhost:5000 \
                         || exit 1
 
