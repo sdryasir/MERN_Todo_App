@@ -31,7 +31,7 @@ pipeline {
         stage('Build Images') {
             steps {
                 bat '''
-                    docker compose build --no-cache
+                    docker compose build
                 '''
             }
         }
