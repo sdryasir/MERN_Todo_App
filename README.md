@@ -70,6 +70,11 @@ Phase 5  → Helm Packaging
 Phase 6  → GitLab Repository & Branch Strategy
 Phase 7  → Jenkins CI Pipeline
 Phase 8  → Jenkins CD Pipeline
+      Phase i   → SonarQube
+      Phase ii  → OWASP Dependency-Check
+      Phase iii → Trivy
+      Phase iv  → Combine everything in Jenkins
+      Phase v   → Security/quality gates
 Phase 9  → Container Registry
 Phase 10 → Kubernetes Production Features
 Phase 11 → Monitoring (Prometheus Stack)
