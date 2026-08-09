@@ -59,6 +59,18 @@ pipeline {
             }
         }
 
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '''
+                    --scan ./
+                    --format HTML
+                ''',
+                odcInstallation: 'OWASP-Dependency-Check'
+
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
         stage('Stop Existing Containers') {
             steps {
                 echo "Stoping Existing Containers"
