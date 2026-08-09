@@ -29,6 +29,19 @@ pipeline {
             }
         }
 
+         stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat '''
+                    sonar-scanner ^
+                    -Dsonar.projectKey=three-tier-app ^
+                    -Dsonar.projectName=ThreeTierApp ^
+                    -Dsonar.sources=.
+                    '''
+                }
+            }
+        }
+
         stage('Stop Existing Containers') {
             steps {
                 echo "Stoping Existing Containers"
