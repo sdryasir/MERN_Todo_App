@@ -28,16 +28,33 @@ pipeline {
                 '''
             }
         }
+        stage('Check SonarScanner') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    echo "Scanner location: ${scannerHome}"
+
+                    bat """
+                        "${scannerHome}\\bin\\sonar-scanner.bat" --version
+                    """
+                }
+            }
+        }
 
          stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    bat '''
-                    sonar-scanner ^
-                    -Dsonar.projectKey=three-tier-app ^
-                    -Dsonar.projectName=ThreeTierApp ^
-                    -Dsonar.sources=.
-                    '''
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        bat """
+                            "${scannerHome}\\bin\\sonar-scanner.bat" ^
+                            -Dsonar.projectKey=three-tier-app ^
+                            -Dsonar.projectName=ThreeTierApp ^
+                            -Dsonar.sources=.
+                        """
+                    }
                 }
             }
         }
