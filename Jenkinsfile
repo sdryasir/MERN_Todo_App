@@ -71,6 +71,14 @@ pipeline {
             }
         }
 
+        stage('Publish OWASP Report') {
+            steps {
+                dependencyCheckPublisher(
+                    pattern: '**/dependency-check-report.xml'
+                )
+            }
+        }
+
         stage('Stop Existing Containers') {
             steps {
                 echo "Stoping Existing Containers"
