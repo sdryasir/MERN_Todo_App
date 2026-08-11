@@ -1,0 +1,11 @@
+services:
+  trivy:
+    image: aquasec/trivy:latest
+    container_name: trivy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - trivy-cache:/root/.cache/
+    entrypoint: ["trivy"]
+
+volumes:
+  trivy-cache:

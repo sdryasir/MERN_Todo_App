@@ -1,0 +1,133 @@
+Build
+
+pipeline{
+    agent any
+
+    parameters{
+        string(name:"REPO_URL", defaultValue:"https://github.com/sdryasir/MERN_Todo_App.git", description:"Repository URL")
+        string(name:"IMAGE_NAME", defaultValue:"my-todo-app", description:"Docker image name")
+        string(name:"BRANCH_NAME", defaultValue:"master", description:"Branch name")
+        string(name:"IMAGE_TAG", defaultValue:"1.0.0", description:"Image tag")
+    }
+
+    environment{
+        DOCKER_REGISTRY = "sdryasir"
+    }
+
+    stages{
+        stage("Checkout Code"){
+            steps{
+                script{
+                    checkout([
+                        $class:'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        userRemoteConfigs:[[
+                            url:"${params.REPO_URL}",
+                            credentialsId:"jenkins-ci-github"
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage("Build Docker Image"){
+            steps{
+                script{
+                    bat "docker build --no-cache -t ${DOCKER_REGISTRY}/${params.IMAGE_NAME}:${params.IMAGE_TAG} ^ ./server"
+                }
+            }
+        }
+        
+        stage("Login to Docker Hub") {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: "jenkins-ci-pat-new",
+                        usernameVariable: "DOCKERHUB_USER",
+                        passwordVariable: "DOCKERHUB_TOKEN"
+                    )
+                ]) {
+                    bat '''
+                        @echo off
+                        echo %DOCKERHUB_TOKEN%|docker login -u %DOCKERHUB_USER% --password-stdin
+                    '''
+                }
+            }
+        }
+        
+        stage("Push Docker Image") {
+            steps {
+                bat """
+                    docker push ${DOCKER_REGISTRY}/${params.IMAGE_NAME}:${params.IMAGE_TAG}
+                """
+            }
+        }
+        
+        stage("Clean up Docker Image") {
+            steps {
+                bat """
+                    echo Removing local Docker image...
+                    docker rmi ${DOCKER_REGISTRY}/${params.IMAGE_NAME}:${params.IMAGE_TAG} || echo Image not found
+                    docker image prune -f || true
+                """
+            }
+        }
+
+    }
+
+    post{
+        always{
+            cleanWs()
+        }
+    }
+}
+
+
+Deploy
+
+pipeline{
+    agent any
+
+    environment{
+        DOCKER_REGISTRY = "",
+        DEPLOY_PATH = ""
+    }
+
+    stages{
+        stage("Deploy Backend"){
+            when{
+                expression{
+                    DEPLOY_TARGET == 'Backend'
+                }
+            }
+            steps{
+                script{
+                    if(!SELECTED_SERVERS?.trim()){
+                        echo "No server selected, please select server"
+                    }
+
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: "jenkins-ci-pat-new",
+                            usernameVariable: "DOCKERHUB_USER",
+                            passwordVariable: "DOCKERHUB_TOKEN"
+                        )
+                    ]) {
+                        bat '''
+                            
+                        '''
+                    }
+
+                }
+            }
+        }
+    }
+
+    post{
+        success{
+            echo "Deployment Completed on ${SELECTED_SERVERS}"
+        }
+        failure{
+            echo "Deployment failed. Check logs"
+        }
+    }
+}
